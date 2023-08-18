@@ -86,6 +86,10 @@
                 "title": "Run AKS Periscope"
             },
             {
+                "command": "aks.bridgetokubernetes",
+                "title": "Run Bridge To Kubernetes"
+            },
+            {
                 "command": "aks.installAzureServiceOperator",
                 "title": "Install Azure Service Operator"
             },
@@ -246,6 +250,11 @@
                 },
                 {
                     "command": "aks.periscope",
+                    "when": "view == kubernetes.cloudExplorer && viewItem =~ /aks\\.cluster/i",
+                    "group": "8@2"
+                },
+                {
+                    "command": "aks.bridgetokubernetes",
                     "when": "view == kubernetes.cloudExplorer && viewItem =~ /aks\\.cluster/i",
                     "group": "8@2"
                 },

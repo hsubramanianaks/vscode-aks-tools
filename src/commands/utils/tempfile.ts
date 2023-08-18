@@ -14,3 +14,10 @@ export async function withOptionalTempFile<T>(
         tempFile.removeCallback();
     }
 }
+
+export async function withOptionalTempFileWithoutFn<T>(content:string,
+    fileType:string): Promise<T> {
+        const tempFile = tmp.fileSync({ prefix: "aks-b2k-", postfix: `.${fileType}` });
+        await fs.writeFile(tempFile.name, content);
+        return tempFile.name;
+}
