@@ -43,7 +43,7 @@ export async function aksRunKubectlCommands(_context: IActionContext, target: an
 
     const customCommands = getKubectlCustomCommands();
     // test sake only.
-    await openaiHelper();
+    await openaiHelper('How can use kubectl?');
     const kubeConfigFile = await tmpfile.createTempFile(clusterInfo.result.kubeconfigYaml, "yaml");
     const dataProvider = new KubectlDataProvider(kubectl, kubeConfigFile.filePath, clusterInfo.result.name, customCommands);
     const panel = new KubectlPanel(extension.result.extensionUri);
