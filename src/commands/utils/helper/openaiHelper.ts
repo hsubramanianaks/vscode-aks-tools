@@ -5,7 +5,6 @@ const openai = new OpenAI({
 });
 
 export async function openaiHelper(error: any): Promise<string | null | undefined> {
-  // Question: How can use kubectl? is placeholder for the user input.
   if (!error) {
     return;
   }
@@ -13,17 +12,10 @@ export async function openaiHelper(error: any): Promise<string | null | undefine
 
   if (error?.error) {
     content = error?.error;
-    content = content.replace(/'/g, '');
   }
-  const teststream = await openai.chat.completions.create({ messages: [{ role: 'user', content: content }], model: 'gpt-3.5-turbo', stream: true }, {
-    timeout: 5 * 1000,
+  const response = await openai.chat.completions.create({ messages: [{ role: 'user', content: content }], model: 'gpt-3.5-turbo' }, {
+    timeout: 30000,
   });
-  for await (const part of teststream) {
-    process.stdout.write(part.choices[0]?.delta?.content || '');
-    return part.choices[0]?.delta?.content;
-  }
-
-  console.log(teststream);
-
-  return undefined;
+  console.log(response);
+  return response.choices[0]?.message?.content || '';
 }

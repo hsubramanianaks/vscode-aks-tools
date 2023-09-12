@@ -46,23 +46,24 @@ export class KubectlDataProvider implements PanelDataProvider<"kubectl"> {
 
         if (failed(kubectlresult)) {
             const aiMsg = await openaiHelper(kubectlresult);
-            const explanation = undefined;
+            const explanation = aiMsg ? `OpenAI GPT-3 Suggestion: ${aiMsg}` : undefined;
             webview.postMessage({
                 command: "runCommandResponse", parameters: {
                     errorMessage: kubectlresult.error,
                     explanation
                 }
             });
+            return;
+        }
 
-            if (aiMsg) {
-                webview.postMessage({
-                    command: "runCommandResponse", parameters: {
-                        errorMessage: aiMsg,
-                        explanation
-                    }
-                });
-            }
-
+        if (kubectlresult.result.stderr !== "" || kubectlresult.result.stdout === "") {
+            const explanation = undefined;
+            webview.postMessage({
+                command: "runCommandResponse", parameters: {
+                    errorMessage: kubectlresult.result.stderr,
+                    explanation
+                }
+            });
             return;
         }
 
