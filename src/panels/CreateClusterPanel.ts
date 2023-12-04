@@ -295,5 +295,7 @@ function isRestError(ex: unknown): ex is RestError {
 }
 
 function isDefaultK8sVersion(version: KubernetesVersion): boolean {
+    // documentation reference https://learn.microsoft.com/en-us/rest/api/aks/managed-clusters/list-kubernetes-versions?view=rest-aks-2023-08-01&tabs=JavaScript
+    // isDefault is not documented, but it is present in the response. We have fall back if this property is not present to pick first version in the list.
     return "isDefault" in version && version.isDefault === true;
 }
