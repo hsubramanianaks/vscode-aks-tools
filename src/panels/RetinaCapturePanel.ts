@@ -63,6 +63,15 @@ export class RetinaCaptureProvider implements PanelDataProvider<"retinaCapture">
     }
 
     private async handleDeleteRetinaNodeExplorer(node: string) {
+        // node is a comma separated string of node names
+        // ex: "aks-nodepool1-12345678-vmss000000,aks-nodepool1-12345678-vmss000001"
+        const nodes = node.split(",");
+        for (const node of nodes) {
+            await this.deleteNodeExplorerUsingKubectl(node);
+        }
+    }
+
+    private async deleteNodeExplorerUsingKubectl(node: string) {
         const deleteResult = await longRunning(`Deleting pod node-explorer-${node}.`, async () => {
             const command = `delete pod node-explorer-${node}`;
             return await invokeKubectlCommand(this.kubectl, this.kubeConfigFilePath, command);
