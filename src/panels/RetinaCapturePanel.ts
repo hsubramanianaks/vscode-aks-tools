@@ -31,7 +31,8 @@ export class RetinaCaptureProvider implements PanelDataProvider<"retinaCapture">
         readonly clusterName: string,
         readonly retinaOutput: string,
         readonly allNodeOutput: string[],
-        readonly captureFolderName: string
+        readonly captureFolderName: string,
+        readonly isNodeExplorerPodExists : boolean
     ) { }
 
     getTitle(): string {
@@ -52,6 +53,7 @@ export class RetinaCaptureProvider implements PanelDataProvider<"retinaCapture">
             allNodes: this.allNodeOutput,
             selectedNode: "",
             captureFolderName: this.captureFolderName,
+            isNodeExplorerPodExists: this.isNodeExplorerPodExists
         };
     }
 
@@ -109,6 +111,8 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: node-explorer-${node}
+  labels:
+    app: node-explorer
 spec:
   nodeName: ${node}
   tolerations:

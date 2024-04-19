@@ -73,12 +73,15 @@ export function RetinaCapture(initialState: InitialState) {
                         <VSCodeButton type="submit" style={{ marginRight: '0.625rem' }} onClick={() => handleCaptureFileDownload()}>
                             Download Retina Logs to Host Machine.
                         </VSCodeButton>
-                        <VSCodeButton appearance="secondary" onClick={() => handleDeleteExplorerPod()}>
-                            <span slot="start">
-                                <FontAwesomeIcon icon={faTrash} />
-                            </span>
-                            Delete Node Explorer Pod
-                        </VSCodeButton>
+                        {state.isNodeExplorerPodExists && (
+                            <VSCodeButton appearance="secondary" onClick={() => handleDeleteExplorerPod()}>
+                                <span slot="start">
+                                    <FontAwesomeIcon icon={faTrash} />
+                                </span>
+                                Delete Node Explorer Pod
+                            </VSCodeButton>
+                        )}
+
                     </div>
 
                 </div>
