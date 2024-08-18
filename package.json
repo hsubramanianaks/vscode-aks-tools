@@ -294,7 +294,12 @@
             },
             {
                 "command": "aks.aksKaito",
-                "title": "Create Kaito Workspace"
+                "title": "Create Kaito Workspace",
+                "enablement": "hasKaitoInstalled"
+            },
+            {
+                "command": "aks.aksKaitoInstall",
+                "title": "Install Kaito"
             }
         ],
         "menus": {
@@ -400,8 +405,9 @@
                     "group": "9@3"
                 },
                 {
-                    "command": "aks.aksKaito",
-                    "when": "view == kubernetes.cloudExplorer && viewItem =~ /aks\\.cluster/i"
+                    "submenu": "aks.kaitoInstallSubMenu",
+                    "when": "view == kubernetes.cloudExplorer && viewItem =~ /aks\\.cluster/i",
+                    "group": "9@3"
                 }
             ],
             "aks.createClusterSubMenu": [
@@ -411,6 +417,16 @@
                 },
                 {
                     "command": "aks.createCluster",
+                    "group": "navigation"
+                }
+            ],
+            "aks.kaitoInstallSubMenu": [
+                {
+                    "command": "aks.aksKaitoInstall",
+                    "group": "navigation"
+                },
+                {
+                    "command": "aks.aksKaito",
                     "group": "navigation"
                 }
             ],
@@ -509,6 +525,10 @@
             {
                 "id": "aks.networkTroubleshootingSubMenu",
                 "label": "Troubleshoot Network Health"
+            },
+            {
+                "id": "aks.kaitoInstallSubMenu",
+                "label": "Kaito Workspace (Beta)"
             }
         ]
     },
