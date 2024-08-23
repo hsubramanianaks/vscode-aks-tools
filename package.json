@@ -291,6 +291,10 @@
             {
                 "command": "aks.aksRetinaCapture",
                 "title": "Run Retina Capture"
+            },
+            {
+                "command": "aks.aksKaito",
+                "title": "Deploy LLM with Kaito"
             }
         ],
         "menus": {
@@ -389,6 +393,10 @@
                     "submenu": "aks.networkTroubleshootingSubMenu",
                     "when": "view == kubernetes.cloudExplorer && viewItem =~ /aks\\.cluster/i",
                     "group": "9@3"
+                },
+                {
+                    "command": "aks.aksKaito",
+                    "when": "view == kubernetes.cloudExplorer && viewItem =~ /aks\\.cluster/i"
                 }
             ],
             "aks.createClusterSubMenu": [
