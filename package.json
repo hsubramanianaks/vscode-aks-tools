@@ -293,9 +293,8 @@
                 "title": "Run Retina Capture"
             },
             {
-                "command": "aks.aksKaitoInstall",
-                "title": "Create Kaito Workspace",
-                "enablement": "hasKaitoInstalled"
+                "command": "aks.aksKaitoGenrateYaml",
+                "title": "Create Kaito Workspace"
             },
             {
                 "command": "aks.aksKaito",
@@ -368,11 +367,6 @@
                     "group": "8@3"
                 },
                 {
-                    "command": "aks.aksKaito",
-                    "when": "view == kubernetes.cloudExplorer && viewItem =~ /aks\\.cluster/i",
-                    "group": "8@3"
-                },
-                {
                     "command": "aks.installAzureServiceOperator",
                     "when": "view == kubernetes.cloudExplorer && viewItem =~ /aks\\.cluster/i || view == extension.vsKubernetesExplorer && viewItem =~ /vsKubernetes\\.\\w*cluster$/i"
                 },
@@ -393,7 +387,7 @@
                 {
                     "command": "aks.aksRunKubectlCommands",
                     "when": "view == kubernetes.cloudExplorer && viewItem =~ /aks\\.cluster/i || view == extension.vsKubernetesExplorer && viewItem =~ /vsKubernetes\\.\\w*cluster$/i",
-                    "group": "9@3"
+                    "group": "8@3"
                 },
                 {
                     "command": "aks.compareCluster",
@@ -422,7 +416,7 @@
             ],
             "aks.kaitoInstallSubMenu": [
                 {
-                    "command": "aks.aksKaitoInstall",
+                    "command": "aks.aksKaitoGenrateYaml",
                     "group": "navigation"
                 },
                 {
