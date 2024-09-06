@@ -1,3 +1,4 @@
+import { VSCodeDropdown, VSCodeOption } from "@vscode/webview-ui-toolkit/react";
 import { ModelDetails } from "../../../src/webview-contract/webviewDefinitions/kaito";
 
 export type KaitoFamilyModelInputProps = {
@@ -7,15 +8,20 @@ export type KaitoFamilyModelInputProps = {
 export function KaitoFamilyModelInput(props: KaitoFamilyModelInputProps) {
     return (
         <div>
-            {props.modelDetails.map((model, index) => (
-                <div key={index}>
-                    <label>{model.family}</label>
-                    <label>{model.modelName}</label>
-                    <label>{model.minimumGpu}</label>
-                    <label>{model.kaitoVersion}</label>
-                    <label>{model.modelSource}</label>
-                </div>
-            ))}
+            <div>Family Model</div>
+            <div>
+                The current supported model families with preset configurations are listed below. Each preset model has
+                its own hardware requirements in terms of GPU count and GPU memory defined in the respective model.go
+                file. Kaito controller performs a validation check of whether the specified SKU and node count are
+                sufficient to run the model or not. Select family model:
+            </div>
+            <div>
+                <VSCodeDropdown>
+                    {props.modelDetails.map((modelDetail) => (
+                        <VSCodeOption key={modelDetail.family}>{modelDetail.family}</VSCodeOption>
+                    ))}
+                </VSCodeDropdown>
+            </div>
         </div>
     );
 }

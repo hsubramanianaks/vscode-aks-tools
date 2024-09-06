@@ -4,11 +4,17 @@ import { getWebviewMessageContext } from "../utilities/vscode";
 
 export type EventDef = Record<string, never>;
 
+export enum Stage {
+    ShowArchitecture,
+    ShowllmModels,
+}
+
 export type KaitoState = InitialState & {
     operationDescription: string;
     kaitoInstallStatus: ProgressEventType;
     errors: string | undefined;
     models: ModelDetails[];
+    stage: Stage;
 };
 
 export const stateUpdater: WebviewStateUpdater<"kaito", EventDef, KaitoState> = {
@@ -18,6 +24,7 @@ export const stateUpdater: WebviewStateUpdater<"kaito", EventDef, KaitoState> = 
         kaitoInstallStatus: ProgressEventType.NotStarted,
         errors: undefined,
         models: [],
+        stage: Stage.ShowArchitecture,
     }),
     vscodeMessageHandler: {
         kaitoInstallProgressUpdate: (state, args) => ({
@@ -26,6 +33,7 @@ export const stateUpdater: WebviewStateUpdater<"kaito", EventDef, KaitoState> = 
             kaitoInstallStatus: args.event,
             errors: args.errorMessage,
             models: args.models,
+            stage: args.event === ProgressEventType.Success ? Stage.ShowllmModels : state.stage,
         }),
         getLLMModelsResponse: (state, args) => ({
             ...state,
