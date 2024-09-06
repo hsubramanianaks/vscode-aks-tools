@@ -30,10 +30,11 @@ import installAzureServiceOperator from "./commands/azureServiceOperators/instal
 import {
     aksBestPracticesDiagnostics,
     aksCategoryConnectivity,
+    aksCCPAvailabilityPerformanceDiagnostics,
     aksCRUDDiagnostics,
     aksIdentitySecurityDiagnostics,
-    aksKnownIssuesAvailabilityPerformanceDiagnostics,
     aksNodeHealth,
+    aksStorageDiagnostics,
 } from "./commands/detectors/detectors";
 import { draftDeployment, draftDockerfile, draftWorkflow } from "./commands/draft/draftCommands";
 import periscope from "./commands/periscope/periscope";
@@ -85,9 +86,10 @@ export async function activate(context: vscode.ExtensionContext) {
         registerCommandWithTelemetry("aks.draftWorkflow", draftWorkflow);
         registerCommandWithTelemetry("aks.aksNodeHealthDiagnostics", aksNodeHealth);
         registerCommandWithTelemetry(
-            "aks.aksKnownIssuesAvailabilityPerformanceDiagnostics",
-            aksKnownIssuesAvailabilityPerformanceDiagnostics,
+            "aks.aksCCPAvailabilityPerformanceDiagnostics",
+            aksCCPAvailabilityPerformanceDiagnostics,
         );
+        registerCommandWithTelemetry("aks.aksStorageDiagnostics", aksStorageDiagnostics);
         registerCommandWithTelemetry("aks.showInPortal", aksNavToPortal);
         registerCommandWithTelemetry("aks.clusterProperties", aksClusterProperties);
         registerCommandWithTelemetry("aks.createClusterNavToAzurePortal", aksCreateClusterNavToAzurePortal);
