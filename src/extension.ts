@@ -44,6 +44,7 @@ import { getKubeconfigYaml, getManagedCluster } from "./commands/utils/clusters"
 import { failed } from "./commands/utils/errorable";
 import { longRunning } from "./commands/utils/host";
 import { Reporter, reporter } from "./commands/utils/reporter";
+import { AksChatResult, chatHandler } from "./handlers/chatHandler";
 import { AksClusterTreeNode } from "./tree/aksClusterTreeItem";
 import { createAzureAccountTreeItem } from "./tree/azureAccountTreeItem";
 import { AzureResourceNodeContributor } from "./tree/azureResourceNodeContributor";
@@ -52,6 +53,19 @@ export async function activate(context: vscode.ExtensionContext) {
     const cloudExplorer = await k8s.extension.cloudExplorer.v1;
     context.subscriptions.push(new Reporter());
     setAssetContext(context);
+
+    // chat registration
+    const chat = vscode.chat.createChatParticipant("chat.aks", chatHandler);
+    chat.followupProvider = {
+        provideFollowups(request: AksChatResult) {
+            return [
+                {
+                    prompt: "Would you like to get the kubeconfig yaml?",
+                    command: request.metadata.command,
+                } satisfies vscode.ChatFollowup,
+            ];
+        },
+    };
 
     // Create and register the Azure session provider before accessing it.
     activateAzureSessionProvider(context);

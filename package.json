@@ -31,6 +31,21 @@
     ],
     "main": "./dist/extension",
     "contributes": {
+        "chatParticipants": [
+            {
+                "id": "chat.aks",
+                "name": "aks",
+                "fullName": "aks",
+                "description": "Azure Kubernetes Service Chat Participant",
+                "isSticky": true,
+                "commands": [
+                    {
+                        "name": "aks.getKubeconfigYaml",
+                        "description": "Get kubeconfig yaml for AKS cluster"
+                    }
+                ]
+            }
+        ],
         "walkthroughs": [
             {
                 "id": "aksvscodewalkthrough",
