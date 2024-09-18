@@ -17,7 +17,7 @@ export async function chatHandler(
     let command = request.command;
     const prompt = request.prompt;
     if (!command) {
-        if (prompt.includes("kubeconfig")) {
+        if (prompt.includes("Kubeconfig")) {
             command = "aks.getKubeconfigYaml";
         }
     }
