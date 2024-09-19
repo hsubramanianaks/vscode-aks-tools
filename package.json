@@ -42,6 +42,10 @@
                     {
                         "name": "aks.getKubeconfigYaml",
                         "description": "Get kubeconfig yaml for AKS cluster"
+                    },
+                    {
+                        "name": "aks.troubleshoot",
+                        "description": "Troubleshoot AKS cluster"
                     }
                 ]
             }

@@ -8,62 +8,182 @@ export interface AksChatResult extends vscode.ChatResult {
 
 const MODEL_SELECTOR: vscode.LanguageModelChatSelector = { vendor: "copilot", family: "gpt-4o" };
 
-export async function chatHandler(
-    request: vscode.ChatRequest,
-    context: vscode.ChatContext,
-    stream: vscode.ChatResponseStream,
-    token: vscode.CancellationToken,
-): Promise<AksChatResult> {
-    let command = request.command;
-    const prompt = request.prompt;
-    if (!command) {
-        if (prompt.includes("kubeconfig")) {
-            command = "aks.getKubeconfigYaml";
-        }
-    }
-    const logger = vscode.env.createTelemetryLogger({
-        sendEventData(eventName, data) {
-            // Capture event telemetry
-            console.log(`Event: ${eventName}`);
-            console.log(`Data: ${JSON.stringify(data)}`);
-        },
-        sendErrorData(error, data) {
-            // Capture error telemetry
-            console.error(`Error: ${error}`);
-            console.error(`Data: ${JSON.stringify(data)}`);
-        },
-    });
+export async function chatHandlerWrapper(extensionContext: vscode.ExtensionContext) {
+    // chat registration
 
-    switch (command) {
-        case "aks.getKubeconfigYaml":
-            stream.progress("Loading ...");
-            console.log("history", context.history);
-            try {
-                const [model] = await vscode.lm.selectChatModels(MODEL_SELECTOR);
-                if (!model) {
-                    throw new Error("No model found");
-                }
-                stream.progress("Model found. Loading...");
-                const messages = [vscode.LanguageModelChatMessage.User(prompt)];
-                const chatResponse = await model.sendRequest(messages, {}, token);
-                for await (const fragment of chatResponse.text) {
-                    stream.markdown(fragment);
-                }
-            } catch (error) {
-                handleError(logger, error, stream);
+    const chatHandlerFunc: vscode.ChatRequestHandler = async (
+        request: vscode.ChatRequest,
+        context: vscode.ChatContext,
+        stream: vscode.ChatResponseStream,
+        token: vscode.CancellationToken,
+    ): Promise<AksChatResult> => {
+        let command = request.command;
+        const prompt = request.prompt;
+        if (!command) {
+            if (prompt.includes("kubeconfig")) {
+                command = "aks.getKubeconfigYaml";
+            } else if (prompt.includes("troubleshoot")) {
+                command = "aks.troubleshoot";
             }
+        }
+        const logger = vscode.env.createTelemetryLogger({
+            sendEventData(eventName, data) {
+                // Capture event telemetry
+                console.log(`Event: ${eventName}`);
+                console.log(`Data: ${JSON.stringify(data)}`);
+            },
+            sendErrorData(error, data) {
+                // Capture error telemetry
+                console.error(`Error: ${error}`);
+                console.error(`Data: ${JSON.stringify(data)}`);
+            },
+        });
 
-            stream.button({
-                command: "aks.getKubeconfigYaml",
-                title: vscode.l10n.t("get kubeconfig yaml"),
-            });
+        switch (command) {
+            case "aks.getKubeconfigYaml":
+                stream.progress("Loading ...");
+                console.log("history", context.history);
+                try {
+                    const [model] = await vscode.lm.selectChatModels(MODEL_SELECTOR);
+                    if (!model) {
+                        throw new Error("No model found");
+                    }
+                    stream.progress("Model found. Loading...");
+                    const messages = [vscode.LanguageModelChatMessage.User(prompt)];
+                    const chatResponse = await model.sendRequest(messages, {}, token);
+                    for await (const fragment of chatResponse.text) {
+                        stream.markdown(fragment);
+                    }
+                } catch (error) {
+                    handleError(logger, error, stream);
+                }
 
-            logger.logUsage("request", { kind: "aks.getKubeconfigYaml" });
-            return { metadata: { command: "aks.getKubeconfigYaml" } };
-        default:
-            throw new Error(`Unknown command: ${command}`);
-    }
+                stream.button({
+                    command: "aks.getKubeconfigYaml",
+                    title: vscode.l10n.t("get kubeconfig yaml"),
+                });
+
+                logger.logUsage("request", { kind: "aks.getKubeconfigYaml" });
+                return { metadata: { command: "aks.getKubeconfigYaml" } };
+            case "aks.troubleshoot":
+                stream.progress("Loading ...");
+                // try {
+                //     const [model] = await vscode.lm.selectChatModels(MODEL_SELECTOR);
+                //     if (!model) {
+                //         throw new Error("No model found");
+                //     }
+                //     stream.progress("Model found. Loading...");
+                //     const messages = [vscode.LanguageModelChatMessage.User(prompt)];
+                //     const chatResponse = await model.sendRequest(messages, {}, token);
+                //     for await (const fragment of chatResponse.text) {
+                //         stream.markdown(fragment);
+                //     }
+                // } catch (error) {
+                //     handleError(logger, error, stream);
+                // }
+                stream.markdown(
+                    "Do you want to troubleshoot your AKS cluster via retina capture for current context cluster, please click troubleshoot button?",
+                );
+                stream.button({
+                    command: "aks.aksRetinaCapture",
+                    title: vscode.l10n.t("troubleshoot"),
+                    arguments: [extensionContext],
+                });
+
+                logger.logUsage("request", { kind: "aks.troubleshoot" });
+                return { metadata: { command: "aks.troubleshoot" } };
+            default:
+                throw new Error(`Unknown command: ${command}`);
+        }
+    };
+
+    vscode.chat.createChatParticipant("chat.aks", chatHandlerFunc);
 }
+
+// export async function chatHandler(
+//     request: vscode.ChatRequest,
+//     context: vscode.ChatContext,
+//     stream: vscode.ChatResponseStream,
+//     token: vscode.CancellationToken,
+// ): Promise<AksChatResult> {
+//     let command = request.command;
+//     const prompt = request.prompt;
+//     if (!command) {
+//         if (prompt.includes("kubeconfig")) {
+//             command = "aks.getKubeconfigYaml";
+//         } else if (prompt.includes("troubleshoot")) {
+//             command = "aks.troubleshoot";
+//         }
+//     }
+//     const logger = vscode.env.createTelemetryLogger({
+//         sendEventData(eventName, data) {
+//             // Capture event telemetry
+//             console.log(`Event: ${eventName}`);
+//             console.log(`Data: ${JSON.stringify(data)}`);
+//         },
+//         sendErrorData(error, data) {
+//             // Capture error telemetry
+//             console.error(`Error: ${error}`);
+//             console.error(`Data: ${JSON.stringify(data)}`);
+//         },
+//     });
+
+//     switch (command) {
+//         case "aks.getKubeconfigYaml":
+//             stream.progress("Loading ...");
+//             console.log("history", context.history);
+//             try {
+//                 const [model] = await vscode.lm.selectChatModels(MODEL_SELECTOR);
+//                 if (!model) {
+//                     throw new Error("No model found");
+//                 }
+//                 stream.progress("Model found. Loading...");
+//                 const messages = [vscode.LanguageModelChatMessage.User(prompt)];
+//                 const chatResponse = await model.sendRequest(messages, {}, token);
+//                 for await (const fragment of chatResponse.text) {
+//                     stream.markdown(fragment);
+//                 }
+//             } catch (error) {
+//                 handleError(logger, error, stream);
+//             }
+
+//             stream.button({
+//                 command: "aks.getKubeconfigYaml",
+//                 title: vscode.l10n.t("get kubeconfig yaml"),
+//             });
+
+//             logger.logUsage("request", { kind: "aks.getKubeconfigYaml" });
+//             return { metadata: { command: "aks.getKubeconfigYaml" } };
+//         case "aks.troubleshoot":
+//             stream.progress("Loading ...");
+//             // try {
+//             //     const [model] = await vscode.lm.selectChatModels(MODEL_SELECTOR);
+//             //     if (!model) {
+//             //         throw new Error("No model found");
+//             //     }
+//             //     stream.progress("Model found. Loading...");
+//             //     const messages = [vscode.LanguageModelChatMessage.User(prompt)];
+//             //     const chatResponse = await model.sendRequest(messages, {}, token);
+//             //     for await (const fragment of chatResponse.text) {
+//             //         stream.markdown(fragment);
+//             //     }
+//             // } catch (error) {
+//             //     handleError(logger, error, stream);
+//             // }
+//             stream.markdown(
+//                 "Do you want to troubleshoot your AKS cluster via retina capture for current context cluster, please click troubleshoot button?",
+//             );
+//             stream.button({
+//                 command: "aks.aksRetinaCapture",
+//                 title: vscode.l10n.t("troubleshoot"),
+//             });
+
+//             logger.logUsage("request", { kind: "aks.troubleshoot" });
+//             return { metadata: { command: "aks.troubleshoot" } };
+//         default:
+//             throw new Error(`Unknown command: ${command}`);
+//     }
+// }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 function handleError(logger: vscode.TelemetryLogger, err: any, stream: vscode.ChatResponseStream): void {
