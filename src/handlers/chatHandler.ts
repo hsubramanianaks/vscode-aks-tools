@@ -19,6 +19,8 @@ export async function chatHandler(
     if (!command) {
         if (prompt.includes("Kubeconfig")) {
             command = "aks.getKubeconfigYaml";
+        } else if (prompt.includes("draft") || prompt.includes("manifest")) {
+            command = "aks.draftDeployment";
         }
     }
     const logger = vscode.env.createTelemetryLogger({
@@ -60,6 +62,19 @@ export async function chatHandler(
 
             logger.logUsage("request", { kind: "aks.getKubeconfigYaml" });
             return { metadata: { command: "aks.getKubeconfigYaml" } };
+        case "aks.draftDeployment":
+            stream.progress("Loading ...");
+            stream.markdown(
+                "Do you want to use draft a deployment option using AKS extension, please click the button below?",
+            );
+
+            stream.button({
+                command: "aks.draftDeployment",
+                title: vscode.l10n.t("draft deployment"),
+            });
+
+            logger.logUsage("request", { kind: "aks.draftDeployment" });
+            return { metadata: { command: "aks.draftDeployment" } };
         default:
             throw new Error(`Unknown command: ${command}`);
     }
