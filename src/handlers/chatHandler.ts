@@ -19,8 +19,6 @@ export async function chatHandler(
     if (!command) {
         if (prompt.includes("Kubeconfig")) {
             command = "aks.getKubeconfigYaml";
-        } else if (prompt.includes("draft") || prompt.includes("manifest")) {
-            command = "aks.draftDeployment";
         }
     }
     const logger = vscode.env.createTelemetryLogger({
@@ -36,45 +34,32 @@ export async function chatHandler(
         },
     });
 
-    switch (command) {
-        case "aks.getKubeconfigYaml":
-            stream.progress("Loading ...");
-            console.log("history", context.history);
-            try {
-                const [model] = await vscode.lm.selectChatModels(MODEL_SELECTOR);
-                if (!model) {
-                    throw new Error("No model found");
+        switch (command) {
+            case "aks.getKubeconfigYaml":
+                stream.progress("Loading ...");
+                console.log("history", context.history);
+                try {
+                    const [model] = await vscode.lm.selectChatModels(MODEL_SELECTOR);
+                    if (!model) {
+                        throw new Error("No model found");
+                    }
+                    stream.progress("Model found. Loading...");
+                    const messages = [vscode.LanguageModelChatMessage.User(prompt)];
+                    const chatResponse = await model.sendRequest(messages, {}, token);
+                    for await (const fragment of chatResponse.text) {
+                        stream.markdown(fragment);
+                    }
+                } catch (error) {
+                    handleError(logger, error, stream);
                 }
-                stream.progress("Model found. Loading...");
-                const messages = [vscode.LanguageModelChatMessage.User(prompt)];
-                const chatResponse = await model.sendRequest(messages, {}, token);
-                for await (const fragment of chatResponse.text) {
-                    stream.markdown(fragment);
-                }
-            } catch (error) {
-                handleError(logger, error, stream);
-            }
 
-            stream.button({
-                command: "aks.getKubeconfigYaml",
-                title: vscode.l10n.t("get kubeconfig yaml"),
-            });
+                stream.button({
+                    command: "aks.getKubeconfigYaml",
+                    title: vscode.l10n.t("get kubeconfig yaml"),
+                });
 
             logger.logUsage("request", { kind: "aks.getKubeconfigYaml" });
             return { metadata: { command: "aks.getKubeconfigYaml" } };
-        case "aks.draftDeployment":
-            stream.progress("Loading ...");
-            stream.markdown(
-                "Do you want to use draft a deployment option using AKS extension, please click the button below?",
-            );
-
-            stream.button({
-                command: "aks.draftDeployment",
-                title: vscode.l10n.t("draft deployment"),
-            });
-
-            logger.logUsage("request", { kind: "aks.draftDeployment" });
-            return { metadata: { command: "aks.draftDeployment" } };
         default:
             throw new Error(`Unknown command: ${command}`);
     }
